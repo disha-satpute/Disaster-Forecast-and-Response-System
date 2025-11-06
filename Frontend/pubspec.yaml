@@ -1,0 +1,33 @@
+name: disaster_forecast
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_lints: ^4.0.0
+  fl_chart: ^0.64.0
+  google_maps_flutter: ^2.5.0
+  http: ^1.5.0
+  shared_preferences: ^2.5.3
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/home.png
+    - assets/signup_illustration.png
+    - assets/login_illustration1.jpg
+    - assets/dashboard_banner.png
+    - assets/weather_banner1.png
