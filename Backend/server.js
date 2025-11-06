@@ -6,6 +6,8 @@ import authRoutes from "./routes/auth.js";
 import profileRoutes from "./routes/profile.js";
 import reportRoutes from "./routes/report.js";
 import adminRoutes from "./routes/admin.js";
+import alertRoutes from "./routes/alertRoutes.js";
+import smsRoutes from "./routes/smsRoutes.js";
 
 
 dotenv.config();
@@ -19,7 +21,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/report", reportRoutes);
 app.use("/api/admin", adminRoutes);
-
+app.use("/api/alerts", alertRoutes);
+app.use("/api/sms", smsRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DisasterAlertsAdvancedForm extends StatefulWidget {
   const DisasterAlertsAdvancedForm({super.key});
@@ -39,13 +41,45 @@ class _DisasterAlertsAdvancedFormState
     "Power Bank": false,
   };
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate() &&
         selectedDisaster != null &&
         drillStatus != null) {
-      setState(() {
-        _submitted = true;
+      final selectedKitItems =
+          kitItems.entries.where((e) => e.value).map((e) => e.key).toList();
+
+      final body = jsonEncode({
+        "disasterType": selectedDisaster,
+        "location": locationController.text,
+        "emergencyContact": emergencyContactController.text,
+        "drillStatus": drillStatus,
+        "responseTeamLevel": responseTeamLevel.toInt(),
+        "evacuationNeeded": evacuationNeeded,
+        "kitItems": selectedKitItems,
       });
+
+      try {
+        final response = await http.post(
+          Uri.parse("http://10.0.2.2:5000/api/alerts/add-alert"),
+          headers: {"Content-Type": "application/json"},
+          body: body,
+        );
+
+        if (response.statusCode == 201) {
+          setState(() => _submitted = true);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("✅ Alert Saved Successfully")),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("⚠️ Failed: ${response.body}")),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("❌ Error: $e")),
+        );
+      }
     }
   }
 
@@ -77,7 +111,7 @@ class _DisasterAlertsAdvancedFormState
     return Scaffold(
       backgroundColor: const Color(0xFFFFE4E1),
       appBar: AppBar(
-        title: const Text("Disaster Alerts"),
+        title: const Text("Create Disaster Alert"),
         backgroundColor: const Color(0xFFD32F2F),
       ),
       body: Padding(
@@ -100,11 +134,16 @@ class _DisasterAlertsAdvancedFormState
                   filled: true,
                   fillColor: Colors.white,
                 ),
-                items: ["Flood", "Earthquake", "Fire", "Cyclone", "Landslide"]
-                    .map(
-                      (type) =>
-                          DropdownMenuItem(value: type, child: Text(type)),
-                    )
+                items: [
+                  "Flood",
+                  "Earthquake",
+                  "Fire",
+                  "Cyclone",
+                  "Landslide",
+                  "Tsunami"
+                ]
+                    .map((type) =>
+                        DropdownMenuItem(value: type, child: Text(type)))
                     .toList(),
                 onChanged: (value) => setState(() => selectedDisaster = value),
                 validator: (value) =>
@@ -176,14 +215,14 @@ class _DisasterAlertsAdvancedFormState
                   backgroundColor: const Color(0xFFD32F2F),
                   foregroundColor: Colors.white,
                 ),
-                child: const Text("Save Alerts"),
+                child: const Text("Save Alert"),
               ),
 
               if (_submitted)
                 const Padding(
                   padding: EdgeInsets.only(top: 12),
                   child: Text(
-                    "Alerts Saved Successfully",
+                    "✅ Alert Saved Successfully",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
