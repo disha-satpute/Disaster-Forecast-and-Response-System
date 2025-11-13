@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 class ResponseDashboard extends StatefulWidget {
   const ResponseDashboard({super.key});
@@ -29,8 +28,12 @@ class _ResponseDashboardState extends State<ResponseDashboard> {
     return Scaffold(
       backgroundColor: const Color(0xFFFFE4E1),
       appBar: AppBar(
-        title: const Text("Response Dashboard"),
+        title: const Text(
+          "Response Dashboard",
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: const Color(0xFFD32F2F),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -38,16 +41,15 @@ class _ResponseDashboardState extends State<ResponseDashboard> {
           _buildCard(
             title: "Team Identity",
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildTextField("Team Name", teamNameController),
                 const SizedBox(height: 8),
-                Text(
-                  "Team Size: 5",
-                  style: const TextStyle(color: Colors.black),
-                ),
+                const Text("Team Size: 5", style: TextStyle(color: Colors.black)),
               ],
             ),
           ),
+
           _buildCard(
             title: "Readiness Meter",
             child: Center(
@@ -65,13 +67,17 @@ class _ResponseDashboardState extends State<ResponseDashboard> {
                     ),
                     Text(
                       "${(readiness * 100).toInt()}%",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
           ),
+
           _buildCard(
             title: "Vehicle Deployment",
             child: Wrap(
@@ -90,6 +96,7 @@ class _ResponseDashboardState extends State<ResponseDashboard> {
               }).toList(),
             ),
           ),
+
           _buildCard(
             title: "Medical Supplies",
             child: Wrap(
@@ -107,6 +114,7 @@ class _ResponseDashboardState extends State<ResponseDashboard> {
               }).toList(),
             ),
           ),
+
           _buildCard(
             title: "Communication Channel",
             child: SwitchListTile(
@@ -116,24 +124,38 @@ class _ResponseDashboardState extends State<ResponseDashboard> {
               activeColor: const Color(0xFFD32F2F),
             ),
           ),
+
           _buildCard(
             title: "Response Notes",
             child: _buildTextField("Add Notes", notesController, maxLines: 3),
           ),
+
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Response details saved successfully!")),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFD32F2F),
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text("Save Response"),
+            child: const Text(
+              "Save Response",
+              style: TextStyle(fontSize: 16),
+            ),
           ),
         ],
       ),
     );
   }
 
+  // --- Helper Widgets ---
   Widget _buildCard({required String title, required Widget child}) {
     return Card(
       elevation: 3,

@@ -1,10 +1,45 @@
 import 'package:flutter/material.dart';
+import './services/weather_services.dart';
 
-class WeatherPage extends StatelessWidget {
+class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
 
+  @override
+  State<WeatherPage> createState() => _WeatherPageState();
+}
+
+class _WeatherPageState extends State<WeatherPage> {
   final Color bgPink = const Color(0xFFFDECEC);
   final Color primaryRed = Colors.redAccent;
+
+  Map<String, dynamic>? weatherData; 
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchWeather();
+  }
+
+  Future<void> fetchWeather() async {
+    try {
+      // Pune Coordinates
+      double lat = 18.5204;
+      double lon = 73.8567;
+
+      WeatherService service = WeatherService();
+      weatherData = await service.getCurrentWeather(lat, lon);
+
+      setState(() {
+        loading = false;
+      });
+    } catch (e) {
+      print("Weather Error: $e");
+      setState(() {
+        loading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,21 +50,25 @@ class WeatherPage extends StatelessWidget {
         backgroundColor: primaryRed,
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            const SizedBox(height: 20),
-            _buildCurrentWeather(),
-            const SizedBox(height: 20),
-            _buildForecast(),
-            const SizedBox(height: 20),
-            _buildAlerts(),
-          ],
-        ),
-      ),
+      body: loading
+          ? const Center(child: CircularProgressIndicator(color: Colors.redAccent))
+          : weatherData == null
+              ? const Center(child: Text("Failed to load weather"))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(),
+                      const SizedBox(height: 20),
+                      _buildCurrentWeather(),
+                      const SizedBox(height: 20),
+                      _buildForecast(),
+                      const SizedBox(height: 20),
+                      _buildAlerts(),
+                    ],
+                  ),
+                ),
     );
   }
 
@@ -38,9 +77,9 @@ class WeatherPage extends StatelessWidget {
       children: [
         Image.asset('assets/weather_banner1.png', height: 80),
         const SizedBox(width: 12),
-        const Text(
-          'Pune, MH\n28°C • Sunny',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        Text(
+          "Pune, MH\n${weatherData!['main']['temp']}°C • ${weatherData!['weather'][0]['main']}",
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -53,11 +92,27 @@ class WeatherPage extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          children: const [
-            _WeatherRow(icon: Icons.thermostat, label: 'Temperature', value: '28°C'),
-            _WeatherRow(icon: Icons.water_drop, label: 'Humidity', value: '65%'),
-            _WeatherRow(icon: Icons.air, label: 'Wind Speed', value: '16 km/h'),
-            _WeatherRow(icon: Icons.visibility, label: 'Visibility', value: '10 km'),
+          children: [
+            _WeatherRow(
+              icon: Icons.thermostat,
+              label: 'Temperature',
+              value: "${weatherData!['main']['temp']}°C",
+            ),
+            _WeatherRow(
+              icon: Icons.water_drop,
+              label: 'Humidity',
+              value: "${weatherData!['main']['humidity']}%",
+            ),
+            _WeatherRow(
+              icon: Icons.air,
+              label: 'Wind Speed',
+              value: "${weatherData!['wind']['speed']} km/h",
+            ),
+            _WeatherRow(
+              icon: Icons.visibility,
+              label: 'Visibility',
+              value: "${(weatherData!['visibility'] / 1000).toStringAsFixed(1)} km",
+            ),
           ],
         ),
       ),
@@ -98,6 +153,7 @@ class WeatherPage extends StatelessWidget {
   }
 }
 
+// Widgets remain same
 class _WeatherRow extends StatelessWidget {
   final IconData icon;
   final String label;

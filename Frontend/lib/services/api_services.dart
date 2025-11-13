@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ApiService {
-  final String baseUrl = "http://192.168.1.8:5000"; // Your PC IP
+  final String baseUrl =  "http://192.168.1.7:5000"; // Your PC IP
 
   // ✅ Save Profile API
   Future<Map<String, dynamic>> saveProfile({
